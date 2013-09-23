@@ -17,6 +17,7 @@ from util import manhattanDistance
 from game import Directions
 import random, util
 from search import mazeDistance
+import sys
 
 from game import Agent
 
@@ -205,7 +206,6 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
           Returns the minimax action using self.depth and self.evaluationFunction
         """
         ret = self.alphaBetaSearch(gameState, 0, -sys.maxint - 1, sys.maxint)
-        print(ret)
         return ret[1]
 
     def alphaBetaSearch(self, gameState, depth, alpha, beta):
@@ -215,13 +215,22 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         for action in actions:
           nextGameState = gameState.generateSuccessor(currentAgent, action)
           isTerminal = nextGameState.isWin() or nextGameState.isLose()
-          if isTerminal or depth == self.depth:
+          if isTerminal or ( (depth + 1) // gameState.getNumAgents() ) == self.depth:
             actionScores += [self.evaluationFunction(nextGameState)]
           else:
             actionScores += [self.alphaBetaSearch(nextGameState, depth + 1, alpha, beta)[0]]
-        bestActionScore = max(actionScores) if currentAgent == 0 else min(actionScores)
-        bestActionIndex = actionScores.index(bestActionScore)
-        return (bestActionScore, actions[bestActionIndex])
+          bestActionScore = max(actionScores) if currentAgent == 0 else min(actionScores)
+          bestActionIndex = actionScores.index(bestActionScore)
+          ret = (bestActionScore, actions[bestActionIndex])
+          if currentAgent == 0:
+            if bestActionScore > beta:
+              return ret
+            alpha = max(alpha, bestActionScore)
+          else:
+            if bestActionScore < alpha:
+              return ret
+            beta = min(beta, bestActionScore)
+        return ret
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
     """
