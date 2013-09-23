@@ -244,8 +244,24 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
           All ghosts should be modeled as choosing uniformly at random from their
           legal moves.
         """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        ret = self.expectimaxSearch(gameState, 0)
+        return ret[1]
+
+    def expectimaxSearch(self, gameState, depth):
+        currentAgent = depth % gameState.getNumAgents()
+        actions = gameState.getLegalActions(currentAgent)
+        actionScores = []
+        for action in actions:
+          nextGameState = gameState.generateSuccessor(currentAgent, action)
+          isTerminal = nextGameState.isWin() or nextGameState.isLose()
+          if isTerminal or ( (depth + 1) // gameState.getNumAgents() ) == self.depth:
+            actionScores += [self.evaluationFunction(nextGameState)]
+          else:
+            actionScores += [self.expectimaxSearch(nextGameState, depth + 1)[0]]
+        bestActionScore = max(actionScores) if currentAgent == 0 else float(sum(actionScores))/len(actionScores)
+        bestAction = actions[actionScores.index(bestActionScore)] if currentAgent == 0 else None
+        return (bestActionScore, bestAction)
+        
 
 def betterEvaluationFunction(currentGameState):
     """
