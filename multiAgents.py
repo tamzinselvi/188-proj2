@@ -178,7 +178,6 @@ class MinimaxAgent(MultiAgentSearchAgent):
             Returns the total number of agents in the game
         """
         ret = self.minimaxSearch(gameState, 0)
-        print(ret)
         return ret[1]
 
     def minimaxSearch(self, gameState, depth):
@@ -188,7 +187,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
         for action in actions:
           nextGameState = gameState.generateSuccessor(currentAgent, action)
           isTerminal = nextGameState.isWin() or nextGameState.isLose()
-          if isTerminal or depth == self.depth:
+          if isTerminal or ( (depth + 1) // gameState.getNumAgents() ) == self.depth:
             actionScores += [self.evaluationFunction(nextGameState)]
           else:
             actionScores += [self.minimaxSearch(nextGameState, depth + 1)[0]]
@@ -205,8 +204,24 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         """
           Returns the minimax action using self.depth and self.evaluationFunction
         """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        ret = self.alphaBetaSearch(gameState, 0, -sys.maxint - 1, sys.maxint)
+        print(ret)
+        return ret[1]
+
+    def alphaBetaSearch(self, gameState, depth, alpha, beta):
+        currentAgent = depth % gameState.getNumAgents()
+        actions = gameState.getLegalActions(currentAgent)
+        actionScores = []
+        for action in actions:
+          nextGameState = gameState.generateSuccessor(currentAgent, action)
+          isTerminal = nextGameState.isWin() or nextGameState.isLose()
+          if isTerminal or depth == self.depth:
+            actionScores += [self.evaluationFunction(nextGameState)]
+          else:
+            actionScores += [self.alphaBetaSearch(nextGameState, depth + 1, alpha, beta)[0]]
+        bestActionScore = max(actionScores) if currentAgent == 0 else min(actionScores)
+        bestActionIndex = actionScores.index(bestActionScore)
+        return (bestActionScore, actions[bestActionIndex])
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
     """
