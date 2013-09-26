@@ -338,7 +338,7 @@ class BetterEvaluationExpectimaxAgent(ExpectimaxAgent):
         deltaFoodMetric =  100 if len(newFoodDistances) == 0 else deltaFoodDistances[minFood[0]]
 
         #import pdb; pdb.set_trace()
-        return (-.3*1/(1+nextGameState.getScore()) - .4*1/(1+distanceFoodMetric) - .1*1/(1+deltaFoodMetric) - 1/(1 + scaredMetric) + .5 * 1/(1+adversaryMetric))
+        return (.3*nextGameState.getScore() +  .4*distanceFoodMetric + .1*deltaFoodMetric + scaredMetric - .5*adversaryMetric)
 
     def expectimaxSearch(self, gameState, depth):
         currentAgent = depth % gameState.getNumAgents()
@@ -351,7 +351,6 @@ class BetterEvaluationExpectimaxAgent(ExpectimaxAgent):
             actionScores += [self.evaluationFunction(gameState, nextGameState, action)]
           else:
             actionScores += [self.expectimaxSearch(nextGameState, depth + 1)[0]]
-        if len(actionScores) == 0: return (0, False)
         bestActionScore = max(actionScores) if currentAgent == 0 else float(sum(actionScores))/len(actionScores)
         bestAction = actions[actionScores.index(bestActionScore)] if currentAgent == 0 else None
         return (bestActionScore, bestAction)
@@ -363,7 +362,7 @@ def betterEvaluationFunction(currentGameState):
 
       DESCRIPTION: <write something here so we know what you did>
     """
-    agent = BetterEvaluationExpectimaxAgent(depth=1)
+    agent = BetterEvaluationExpectimaxAgent()
     return agent.getCost(currentGameState)
 
 # Abbreviation
