@@ -363,71 +363,8 @@ def betterEvaluationFunction(currentGameState):
 
       DESCRIPTION: <write something here so we know what you did>
     """
-    def distance(pos1, pos2, state):
-        try:
-          return mazeDistance(pos1, pos2, state)
-        except:
-          return abs(pos1[0] - pos2[0]) + abs(pos1[1] - pos2[1])
-
-    def isFacingMe(my, other, direction):
-        if my[0] - other[0] < 0 and direction == 'East':
-          return True
-        if my[0] - other[0] > 0 and direction == 'West':
-          return True
-        if my[1] - other[1] < 0 and direction == 'South':
-          return True
-        if my[1] - other[1] > 0 and direction == 'North':
-          return True
-        return False
-
-    def evaluationFunction(currentGameState):
-        """
-        Design a better evaluation function here.
-
-        The evaluation function takes in the current and proposed successor
-        GameStates (pacman.py) and returns a number, where higher numbers are better.
-
-        The code below extracts some useful information from the state, like the
-        remaining food (newFood) and Pacman position after moving (newPos).
-        newScaredTimes holds the number of moves that each ghost will remain
-        scared because of Pacman having eaten a power pellet.
-
-        Print out these variables to see what you're getting, then combine them
-        to create a masterful evaluation function.
-        """
-        # Useful information you can extract from a GameState (pacman.py)
-        pos = currentGameState.getPacmanPosition()
-        food = currentGameState.getFood()
-        currentScore = currentGameState.getScore()
-        scoreDelta = currentScore/1000.
-        ghostStates = currentGameState.getGhostStates()
-
-        ghostDelta = 0
-        scared = filter(lambda ghostState: ghostState.scaredTimer > 0, ghostStates)
-        for g in scared:
-          d = distance(pos, g.getPosition(), currentGameState)
-          if d < g.scaredTimer: ghostDelta = 1./(d/4.)
-
-        gridCords = [(x,y) for x in range(food.width) for y in range(food.height)]
-        foodPos = filter(lambda pos:food[pos[0]][pos[1]], gridCords)
-        closestFood = float("inf")
-        totalFoodDistance = 0
-        for p in foodPos:
-          d = distance(pos, p, currentGameState)
-          totalFoodDistance += d
-          if d < closestFood: closestFood = d
-        closestFoodDelta = 1./closestFood
-        totalFoodDistanceDelta = len(foodPos)/(1+totalFoodDistance)
-        totalFoodDelta = 1./(1+len(foodPos))
-
-        #import pdb; pdb.set_trace()
-        # state score + foodDelta + scared + adversary
-        # print str((scoreDelta, closestFoodDelta, totalFoodDistanceDelta, totalFoodDelta, ghostDelta))
-        cost = .6 * scoreDelta + .001 * closestFoodDelta + .201 * totalFoodDistanceDelta + .2 * totalFoodDelta + ghostDelta
-        # print 'cost: '+str(cost)
-        return cost
-
-    return evaluationFunction(currentGameState)
+    agent = BetterEvaluationExpectimaxAgent(depth=1)
+    return agent.getCost(currentGameState)
 
 # Abbreviation
 better = betterEvaluationFunction
